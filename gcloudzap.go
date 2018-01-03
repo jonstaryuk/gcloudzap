@@ -18,6 +18,7 @@ the zapcore.Core implementation provided by this package.
 
 
 Zap docs: https://godoc.org/go.uber.org/zap
+
 Stackdriver Logging docs: https://cloud.google.com/logging/docs/
 
 */
@@ -116,7 +117,7 @@ type Core struct {
 // and to Stackdriver using the provided client and log ID.
 //
 // For fields to be written to Stackdriver, you must use the With() method on
-// the returned Core rathern than just on zc. (This function has no way of
+// the returned Core rather than just on zc. (This function has no way of
 // knowing about fields that already exist on zc. They will be preserved when
 // writing to zc's existing destination, but not to Stackdriver.)
 func Tee(zc zapcore.Core, client *gcl.Client, gclLogID string) zapcore.Core {
@@ -135,7 +136,7 @@ func Tee(zc zapcore.Core, client *gcl.Client, gclLogID string) zapcore.Core {
 	return zapcore.NewTee(zc, gc)
 }
 
-// Enabled implements zapcore.Core. It is an alias to c.LevelEnabled.
+// Enabled implements zapcore.Core.
 func (c *Core) Enabled(l zapcore.Level) bool {
 	return l >= c.MinLevel
 }
