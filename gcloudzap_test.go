@@ -135,12 +135,40 @@ func BenchmarkCoreClone(b *testing.B) {
 	}
 }
 
+func TestCoreSync(t *testing.T) {
+	l := &testLogger{}
+	c := &Core{Logger: l}
+
+	if err := c.Sync(); err != nil {
+		t.Error(err)
+	}
+	if !l.flushed {
+		t.Error("Logger not flushed")
+	}
+}
+
+func TestCoreLevels(t *testing.T) {
+	c := &Core{MinLevel: zapcore.InfoLevel}
+	if c.Enabled(zapcore.DebugLevel) {
+		t.Error("Debug level must not be enabled with MinLevel set to Info")
+	}
+
+	c = &Core{MinLevel: zapcore.WarnLevel}
+	if !c.Enabled(zapcore.ErrorLevel) {
+		t.Error("Error level must be enabled with MinLevel set to Warn")
+	}
+}
+
 type testLogger struct {
 	entries []gcl.Entry
 	mu      sync.Mutex
+	flushed bool
 }
 
-func (t *testLogger) Flush() error { return nil }
+func (t *testLogger) Flush() error {
+	t.flushed = true
+	return nil
+}
 
 func (t *testLogger) Log(e gcl.Entry) {
 	// simulate adding entries to a buffer
