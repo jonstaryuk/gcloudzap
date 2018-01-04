@@ -51,7 +51,7 @@ func TestCoreWrite(t *testing.T) {
 	}
 	fields := []zapcore.Field{{Key: "baz", Interface: "qux"}}
 	if err := c2.Write(e, fields); err != nil {
-		t.Error(err)
+		t.Fatal(err)
 	}
 	expected := []gcl.Entry{
 		{
@@ -73,7 +73,7 @@ func TestCoreWrite(t *testing.T) {
 
 	fields = []zapcore.Field{{Key: "asdf", Interface: "asdf"}}
 	if err := c2.Write(e, fields); err != nil {
-		t.Error(err)
+		t.Fatal(err)
 	}
 	expected = append(expected, gcl.Entry{
 		Timestamp: ts,
@@ -103,7 +103,7 @@ func TestConcurrentCoreWrite(t *testing.T) {
 		go func() {
 			fields := []zapcore.Field{{Key: "i", Interface: index}}
 			if err := c.Write(zapcore.Entry{}, fields); err != nil {
-				t.Error(err)
+				t.Fatal(err)
 			}
 			wg.Done()
 		}()
@@ -121,26 +121,12 @@ func TestConcurrentCoreWrite(t *testing.T) {
 	}
 }
 
-func BenchmarkCoreClone(b *testing.B) {
-	c := &Core{}
-	for i := 0; i < b.N; i++ {
-		c.With([]zapcore.Field{
-			{Key: "i", Interface: i},
-			{Key: "foo", Interface: "bar"},
-			{Key: "bar", Interface: "baz"},
-			{Key: "longstring", Interface: "asdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdf"},
-			{Key: "longstring2", Interface: "asdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdf"},
-			{Key: "longstring3", Interface: "asdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdf"},
-		})
-	}
-}
-
 func TestCoreSync(t *testing.T) {
 	l := &testLogger{}
 	c := &Core{Logger: l}
 
 	if err := c.Sync(); err != nil {
-		t.Error(err)
+		t.Fatal(err)
 	}
 	if !l.flushed {
 		t.Error("Logger not flushed")
@@ -175,6 +161,18 @@ func (t *testLogger) Log(e gcl.Entry) {
 	t.mu.Lock()
 	t.entries = append(t.entries, e)
 	t.mu.Unlock()
+}
+
+func BenchmarkCoreClone(b *testing.B) {
+	c := &Core{}
+	for i := 0; i < b.N; i++ {
+		c.With([]zapcore.Field{
+			{Key: "foo", Interface: "bar"},
+			{Key: "longstring", Interface: "asdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdf"},
+			{Key: "longstring2", Interface: "asdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdf"},
+			{Key: "longstring3", Interface: "asdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdf"},
+		})
+	}
 }
 
 func BenchmarkCoreWrite(b *testing.B) {

@@ -3,7 +3,7 @@
 
 [[projects]]
   name = "cloud.google.com/go"
-  packages = ["compute/metadata","internal/version","logging","logging/apiv2","logging/internal"]
+  packages = ["compute/metadata","internal/version","logging","logging/apiv2","logging/internal","logging/logadmin"]
   revision = "050b16d2314d5fc3d4c9a51e4cd5c7468e77f162"
   version = "v0.17.0"
 
@@ -82,7 +82,7 @@
 [[projects]]
   branch = "master"
   name = "google.golang.org/genproto"
-  packages = ["googleapis/api/annotations","googleapis/api/distribution","googleapis/api/label","googleapis/api/metric","googleapis/api/monitoredres","googleapis/logging/type","googleapis/logging/v2","googleapis/rpc/status","protobuf/field_mask"]
+  packages = ["googleapis/api/annotations","googleapis/api/distribution","googleapis/api/label","googleapis/api/metric","googleapis/api/monitoredres","googleapis/appengine/logging/v1","googleapis/cloud/audit","googleapis/logging/type","googleapis/logging/v2","googleapis/rpc/status","protobuf/field_mask"]
   revision = "a8101f21cf983e773d0c1133ebc5424792003214"
 
 [[projects]]
@@ -94,6 +94,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "d2e868c8db7401afd460744e096dc12b931a718ae393151c3d05a8e1bfccae87"
+  inputs-digest = "2fed98c972e5586455967b368bc998a0f2c239521550ddab0b997c7ad6ac276f"
   solver-name = "gps-cdcl"
   solver-version = 1

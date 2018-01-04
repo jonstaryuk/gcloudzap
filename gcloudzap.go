@@ -5,9 +5,10 @@ Stackdriver Logging service as structured payloads.
 All zap.Logger instances created with this package are safe for concurrent
 use.
 
-Writes are buffered and asynchronous. These benchmarks, on a MacBook Pro 2.4
-GHz Core i5, are a loose approximation of latencies on the critical path for
-the zapcore.Core implementation provided by this package.
+Network calls (which are delegated to the Google Cloud Platform package) are
+asynchronous and buffered. These benchmarks, on a MacBook Pro 2.4 GHz Core i5,
+are a loose approximation of latencies on the critical path for the
+zapcore.Core implementation provided by this package.
 
 	$ go test -bench . github.com/jonstaryuk/gcloudzap
 	goos: darwin
@@ -27,6 +28,7 @@ package gcloudzap // import "github.com/jonstaryuk/gcloudzap"
 import (
 	"context"
 	"fmt"
+	"time"
 
 	gcl "cloud.google.com/go/logging"
 	"go.uber.org/zap"
@@ -214,7 +216,62 @@ func clone(orig map[string]interface{}, newFields []zapcore.Field) map[string]in
 	}
 
 	for _, f := range newFields {
-		clone[f.Key] = f.Interface
+		switch f.Type {
+		// case zapcore.UnknownType:
+		case zapcore.ArrayMarshalerType:
+			clone[f.Key] = f.Interface
+		case zapcore.ObjectMarshalerType:
+			clone[f.Key] = f.Interface
+		case zapcore.BinaryType:
+			clone[f.Key] = f.Interface
+		case zapcore.BoolType:
+			clone[f.Key] = (f.Integer == 1)
+		case zapcore.ByteStringType:
+			clone[f.Key] = f.String
+		case zapcore.Complex128Type:
+			clone[f.Key] = fmt.Sprint(f.Interface)
+		case zapcore.Complex64Type:
+			clone[f.Key] = fmt.Sprint(f.Interface)
+		case zapcore.DurationType:
+			clone[f.Key] = time.Duration(f.Integer).String()
+		case zapcore.Float64Type:
+			clone[f.Key] = float64(f.Integer)
+		case zapcore.Float32Type:
+			clone[f.Key] = float32(f.Integer)
+		case zapcore.Int64Type:
+			clone[f.Key] = int64(f.Integer)
+		case zapcore.Int32Type:
+			clone[f.Key] = int32(f.Integer)
+		case zapcore.Int16Type:
+			clone[f.Key] = int16(f.Integer)
+		case zapcore.Int8Type:
+			clone[f.Key] = int8(f.Integer)
+		case zapcore.StringType:
+			clone[f.Key] = f.String
+		case zapcore.TimeType:
+			clone[f.Key] = f.Interface.(time.Time)
+		case zapcore.Uint64Type:
+			clone[f.Key] = uint64(f.Integer)
+		case zapcore.Uint32Type:
+			clone[f.Key] = uint32(f.Integer)
+		case zapcore.Uint16Type:
+			clone[f.Key] = uint16(f.Integer)
+		case zapcore.Uint8Type:
+			clone[f.Key] = uint8(f.Integer)
+		case zapcore.UintptrType:
+			clone[f.Key] = uintptr(f.Integer)
+		case zapcore.ReflectType:
+			clone[f.Key] = f.Interface
+		// case zapcore.NamespaceType:
+		case zapcore.StringerType:
+			clone[f.Key] = f.Interface.(fmt.Stringer).String()
+		case zapcore.ErrorType:
+			clone[f.Key] = f.Interface.(error).Error()
+		case zapcore.SkipType:
+			continue
+		default:
+			clone[f.Key] = f.Interface
+		}
 	}
 
 	return clone
