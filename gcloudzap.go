@@ -6,9 +6,9 @@ All zap.Logger instances created with this package are safe for concurrent
 use.
 
 Network calls (which are delegated to the Google Cloud Platform package) are
-asynchronous and buffered. These benchmarks, on a MacBook Pro 2.4 GHz Core i5,
-are a loose approximation of latencies on the critical path for the
-zapcore.Core implementation provided by this package.
+asynchronous and payloads are buffered. These benchmarks, on a MacBook Pro 2.4
+GHz Core i5, are a loose approximation of latencies on the critical path for
+the zapcore.Core implementation provided by this package.
 
 	$ go test -bench . github.com/jonstaryuk/gcloudzap
 	goos: darwin
